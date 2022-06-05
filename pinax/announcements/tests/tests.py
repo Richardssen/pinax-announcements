@@ -82,10 +82,7 @@ class TestViews(TestCase):
 
     def assertRedirectsToLogin(self, response, next):
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.url,
-            "{}?next={}".format(self.login_redirect, next)
-        )
+        self.assertEqual(response.url, f"{self.login_redirect}?next={next}")
 
     def get_session_data(self):
         session = Session.objects.get()
@@ -445,13 +442,16 @@ class TestTags(TestCase):
         context = dict(request=request)
 
         node.render(context)
-        self.assertSetEqual(set(context["announcements_list"]), set([self.first, self.second]))
+        self.assertSetEqual(
+            set(context["announcements_list"]), {self.first, self.second}
+        )
+
 
         # dismiss one announcement
         self.second.dismissals.create(user=self.user)
 
         node.render(context)
-        self.assertSetEqual(set(context["announcements_list"]), set([self.first]))
+        self.assertSetEqual(set(context["announcements_list"]), {self.first})
 
     @mock.patch("django.template.Variable")
     def test_anonymous_announcements(self, Variable):
@@ -473,4 +473,6 @@ class TestTags(TestCase):
         context = dict(request=request)
 
         node.render(context)
-        self.assertSetEqual(set(context["announcements_list"]), set([self.first, self.second]))
+        self.assertSetEqual(
+            set(context["announcements_list"]), {self.first, self.second}
+        )
